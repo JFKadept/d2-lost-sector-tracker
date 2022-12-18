@@ -1,10 +1,6 @@
-export type DestinyActivity = {
-    displayProperties: {
-        description: string
-        name: string
-        icon: string
-        hasIcon: boolean
-    }
+import { DestinyEntity } from "./DestinyEntity.ts"
+
+export type DestinyActivity = DestinyEntity & {
     originalDisplayProperties: {
         description: string
         name: string

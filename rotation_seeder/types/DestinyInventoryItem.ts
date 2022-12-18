@@ -1,10 +1,6 @@
-export type DestinyInventoryItem = {
-    displayProperties: {
-        description: string
-        name: string
-        icon: string
-        hasIcon: boolean
-    }
+import { DestinyEntity } from "./DestinyEntity.ts"
+
+export type DestinyInventoryItem = DestinyEntity & {
     tooltipNotifications: []
     backgroundColor: {
         colorHash: number
@@ -53,8 +49,4 @@ export type DestinyInventoryItem = {
     equippable: boolean
     defaultDamageType: number
     isWrapper: boolean
-    hash: number
-    index: number
-    redacted: boolean
-    blacklisted: boolean
 }
