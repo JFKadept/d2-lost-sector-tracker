@@ -1,6 +1,5 @@
-export type Modifier = {
+export type Reward = {
     id: number
     name: string
-    description: string
     icon: string
 }
