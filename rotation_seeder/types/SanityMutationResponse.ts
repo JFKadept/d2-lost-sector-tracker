@@ -1,7 +1,7 @@
 export type SanityMutationResponse = {
-    transactionId: string
-    results: {
-        id: string,
-        operation: string
-    }[]
-}
+  transactionId: string;
+  results: {
+    id: string;
+    operation: string;
+  }[];
+};
