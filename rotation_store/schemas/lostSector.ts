@@ -14,7 +14,10 @@ export const lostSector = {
         {
             name: "modifiers",
             type: "array",
-            of: [{ type: "modifier" }]
+            of: [{
+                type: "reference",
+                to: [{ type: "modifier" }]
+            }]
         }
     ],
 }

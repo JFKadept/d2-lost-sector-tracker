@@ -1,7 +1,7 @@
 export const modifier = {
     name: "modifier",
     title: "Modifier",
-    type: "object",
+    type: "document",
     fields: [
         {
             name: "name",
