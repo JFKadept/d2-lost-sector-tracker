@@ -1,3 +1,5 @@
+import { mergeHeaders } from "../lib/merge_headers.ts"
+
 type NetClientInit = Partial<{
     baseURL: string
     headers: Headers
@@ -19,25 +21,45 @@ type NetResponse<T> = {
 }
 
 export class NetClient {
-    private defaults: NetClientInit
+    protected defaults: NetClientInit
 
     constructor(cfg: NetClientInit) {
-        this.defaults = cfg
+        this.defaults = {
+            redirect: "follow",
+            ...cfg,
+        }
+    }
+
+    private trimLeadingSlash(pathname: string) {
+        return pathname[0] === "/" ? pathname.slice(1) : pathname
+    }
+
+    private trimTrailingSlash(url: string) {
+        return url[url.length - 1] === "/" ? url.slice(0, url.length - 1) : url
     }
 
     private async request<T>(pathname: string, init?: NetRequest): Promise<NetResponse<T>> {
-        const url = this.defaults.baseURL ? new URL(pathname, this.defaults.baseURL) : pathname
+        const url = this.defaults.baseURL
+            ? new URL(this.trimLeadingSlash(pathname), `${this.trimTrailingSlash(this.defaults.baseURL)}/`)
+            : pathname
+
         const urlWithParams = `${url}${init?.params ? `?${init.params.toString()}` : ""}`
+
         const method = init?.method?.toUpperCase() ?? "GET"
 
-        console.log(`${method} to ${urlWithParams}`)
-
-        const res = await fetch(url, {
+        const req = new Request(urlWithParams, {
             method,
             body: init?.body,
             redirect: this.defaults.redirect,
-            headers: init?.headers,
+            headers: mergeHeaders(
+                this.defaults.headers ?? new Headers(),
+                init?.headers ?? new Headers()
+            ),
         })
+
+        console.log(`${req.method} to ${req.url}`)
+
+        const res = await fetch(req)
 
         if (!res.ok) {
             throw new Error(`${method} to ${urlWithParams} failed with ${res.status} (${res.statusText})`)
