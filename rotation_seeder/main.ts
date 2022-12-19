@@ -11,37 +11,28 @@ import { DestinyModifier } from "./types/DestinyModifier.ts";
 import { rewardAdapter } from "./adapters/reward.ts";
 import { BungieClient } from "./clients/bungie.ts";
 import { DestinyInventoryItem } from "./types/DestinyInventoryItem.ts";
+import { Modifier } from "./types/Modifier.ts";
+import { SanityClient } from "./clients/sanity.ts";
+import { DestinyActivityMode } from "./types/DestinyActivityMode.ts";
 
 const bungieClient = new BungieClient()
-
-const LOST_SECTOR_NAMES = [
-    "K1 Logistics",
-    "K1 Crew Quarters",
-    "K1 Revelation",
-    "K1 Communion",
-    "Bunker E15",
-    "Concealed Void",
-    "Perdition",
-    "Sepulcher",
-    "Extraction",
-    "Chamber of Starlight",
-    "Aphelion's Rest",
-]
+const sanityClient = new SanityClient()
 
 async function main(locale: string) {
     const {
         DestinyActivityDefinition,
+        DestinyActivityModeDefinition,
         DestinyActivityModifierDefinition,
         DestinyInventoryItemDefinition,
     } = await bungieClient.getJSONWorldContent(locale)
 
-    const activityDefs = Object.values(DestinyActivityDefinition) as DestinyActivity[]
+    const lostSectorMode = (Object.values(DestinyActivityModeDefinition) as DestinyActivityMode[]).find((mode) => mode.friendlyName === "lost_sector")
 
-    const legendLostSectorActivityDefs = LOST_SECTOR_NAMES
-        .map((name) => activityDefs.find((activity) =>
-            activity.displayProperties.name.match(name)
-            && activity.displayProperties.name.endsWith("Legend")
-        )) as DestinyActivity[]
+    const legendLostSectorActivityDefs = (Object.values(DestinyActivityDefinition) as DestinyActivity[])
+        .filter((activity) =>
+            activity.activityTypeHash === lostSectorMode?.hash
+            && activity.displayProperties.name.includes("Legend")
+        )
 
     const modifiers = legendLostSectorActivityDefs
         .flatMap(getActivityModifierHashes)
@@ -56,8 +47,21 @@ async function main(locale: string) {
         .reduce(getUniqueDestinyEntities, [] as DestinyInventoryItem[])
         .filter((reward) => reward.displayProperties.name.includes("Exotic"))
         .map(rewardAdapter)
+        
+    const modifierMap = modifiers.reduce((mods, mod) => ({
+        ...mods,
+        [mod.id]: mod,
+    }), {} as Record<string, Modifier>)
 
+    const lostSectors = legendLostSectorActivityDefs.map(lostSectorAdapter(modifierMap))
     // TODO: populate Sanity
+
+    try {
+        const { results } = await sanityClient.seedData(rewards, modifiers, lostSectors, { returnIds: true })
+        console.log(`Committed ${results.length} mutations`)
+    } catch (error) {
+        console.error(error.message)
+    }
 }
 
 main("en")
