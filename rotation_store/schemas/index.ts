@@ -1,10 +1,10 @@
-import { lostSectorRotation } from "./lostSectorRotation"
+import { rotation } from "./rotation"
 import { lostSector } from "./lostSector"
 import { modifier } from "./modifier"
 import { rewardItem } from "./rewardItem"
 
 export const schemaTypes = [
-    lostSectorRotation,
+    rotation,
     lostSector,
     modifier,
     rewardItem,

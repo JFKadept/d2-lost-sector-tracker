@@ -16,9 +16,9 @@ export default defineConfig({
         .title("Content")
         .items([
           S.documentListItem()
-            .id("lostSectorRotation")
+            .id("rotation")
             .title("Rotation")
-            .schemaType("lostSectorRotation"),
+            .schemaType("rotation"),
           S.divider(),
           ...S.documentTypeListItems().filter((item) => item.getId() !== "lostSectorRotation")
         ])

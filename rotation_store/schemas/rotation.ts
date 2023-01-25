@@ -1,14 +1,14 @@
-export const lostSectorRotation = {
-    name: "lostSectorRotation",
+export const rotation = {
+    name: "rotation",
     title: "Lost Sector Rotation",
     type: "object",
     fields: [
         {
-            name: "rotation",
-            title: "Rotation",
+            name: "lostSectors",
+            title: "Lost Sectors",
             type: "array",
             of: [{
-                name: "day",
+                name: "rotationItem",
                 type: "object",
                 fields: [
                     {
@@ -21,6 +21,15 @@ export const lostSectorRotation = {
                         type: "reference",
                         to: [{ type: "rewardItem" }],
                     },
+                    {
+                        name: "active",
+                        type: "boolean",
+                        initialValue: false,
+                    },
+                    {
+                        name: "activeOn",
+                        type: "datetime",
+                    }
                 ],
             }],
         }
